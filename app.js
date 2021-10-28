@@ -138,7 +138,7 @@ MembersRouter.route('/')
     }
 })
 
-app.use('config.rootAPI+members', MembersRouter)
+app.use(config.rootAPI+'members', MembersRouter)
 
 app.listen(config.port, () => console.log('Started on port'+config.port))
 
