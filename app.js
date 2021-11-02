@@ -1,156 +1,37 @@
 require('babel-register')
-const {success, error} = require('function')
-const bodyParser = require('body-parser')
-const express = require('express')
-const morgan = require('morgan')
-const app = express()
-const config = require('./config')
 
-const members = [
-    {
-        id: 1,
-        name: 'Jack'
-    },
-    {
-        id: 2,
-        name: 'Julie'
-    },
-    {
-        id: 3,
-        name: 'John'
+console.log('Début');
+
+/*getMember()
+  .then(member => getArticles(member))
+  .then(articles => console.log(articles))*/
+
+(async () => {
+    try {
+        let member = await getMember()
+        let articles = await getArticles(member)
+    console.log(articles)
+    } catch (err) {
+        console.log(err.message)
     }
-]
-let MembersRouter = express.Router()
+})()
 
-app.use(morgan('dev'))
-app.use(bodyParser.json()); 
-app.use(bodyParser.urlencoded({extended: true}));
-
-MembersRouter.route('/:id')
-
-// Récupère un membre avec son ID
-.get((req, res) => {
-
-    let index = getIndex(req.params.id);
-
-if (typeof(index) == 'string') {
-    res.json(error(index))
-
-}else {
-
-    res.json(success(members[index]))
-
-}
-
-})
-
-// Modifie un membre avec son ID
-.put((req, res) => {
-
-    let index = getIndex(req.params.id);
-
-    if (typeof(index) == 'string') {
-        res.json(error(index))
-    }else {
-        
-        let same = false
-
-        for(let i = 0; i < members.length; i++) {
-           if (req.body.name == members[i].name && req.params.id != members[i].id){
-               same = true
-               break
-           }
-        }
-
-        if (same) {
-
-            res.json(error('same name'))
-        }else {
-            members[index].name = req.body.name
-            res.json(success(true))
-
-        }
+  function getMember() {
+      return new Promise ((resolve, reject) => {
+          setTimeout(() => {
+              resolve('Member 1')
+          }, 1500)
+      })
     }
-})
+      function getArticles(member) {
+        return new Promise ((resolve, reject) => {
+            setTimeout(() => {
+                resolve([1, 2, 3])
+            }, 1500)
+        })
+  }
 
-// Supprimer un membre avec son ID
-.delete((req, res) => {
 
-    let index = getIndex(req.params.id);
+console.log('fin')
 
-    if (typeof(index) == 'string') {
-        res.json(error(index))
-    } else {
-        members.splice(index, 1)
-        res.json(success(members))
-    }
-})
 
-MembersRouter.route('/')
-
-// Récupère tous les membres
-.get((req, res) => {
-    if(req.query.max != undefined && req.query.max > 0) {
-       res.json(success(members.slice(0, req.query.max)))   
-    } else if (req.query.max != undefined) {
-        res.json(error('Wrong max value'))
-    } else {
-        res.json(success(members))
-    }
-    
-})
-
-// Ajoute un membre avec son nom
-.post((req, res) => {
-  
-    if (req.body.name) {
-
-        let sameName = false
-
-        for (let i = 0; i < members.length; i++) {
-            if (memebers[i].name == req.body.name) {              
-                sameName = true
-                break
-            }
-        }
-
-        if (sameName) {
-
-            res.json(error('name already taken'))
-
-        } else {
-          
-            let member = {
-                id: createID(),
-                name: req.body.name
-            }
-        }
-        
-
-      
-
-        members.push(members)
-
-       res.json(success(member))
-
-    }else {
-        res.json(error('no name value'))
-    }
-})
-
-app.use(config.rootAPI+'members', MembersRouter)
-
-app.listen(config.port, () => console.log('Started on port'+config.port))
-
-function getIndex(id) {
-    for (let i = 0; i < members.length; i++) {
-        if (members[i].id == id) 
-            return i
-        
-    }
-    return 'wrong id'
-}
-
-function createID() {
-   return member = members[members.length-1].id + 1
-}
